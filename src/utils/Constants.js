@@ -1,0 +1,1 @@
+export const HIGHLIGHT_COLOR = "RGB(111, 143, 114)";
