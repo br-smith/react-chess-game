@@ -6,32 +6,26 @@ export default class Bishop extends Piece {
     }
 
     isMovePossible(src, dest) {
-        return Math.abs(src - dest) % 9 === 0 || Math.abs(src - dest) % 7 === 0
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
+
+        return Math.abs(destRank - srcRank) === Math.abs(destFile - srcFile);
     }
 
     getSrcToDestPath(src, dest) {
-        let path = [], pathStart, pathEnd, incrementBy;
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
 
-        if (src > dest) {
-            pathStart = dest;
-            pathEnd = src;
-        } else {
-            pathStart = src;
-            pathEnd = dest;
+        let path = [];
+
+        const difference = Math.abs(destRank - srcRank);
+        const rankDirection = (destRank - srcRank)/Math.abs(destRank - srcRank);
+        const fileDirection = (destFile - srcFile)/Math.abs(destFile - srcFile);
+
+        for(let i = 1; i < difference; i++){
+            path.push({ rank: srcRank + i * rankDirection, file: srcFile + i * fileDirection });
         }
 
-        if (Math.abs(src - dest) % 9 === 0) {
-            incrementBy = 9;
-            pathStart += 9;
-        } else if (Math.abs(src - dest) % 7 === 0) {
-            incrementBy = 7;
-            pathStart += 7;
-        }
-
-        for(let i = pathStart; i < pathEnd; i+=incrementBy){
-            path.push(i);
-        }
-        
         return path;
     }
 }

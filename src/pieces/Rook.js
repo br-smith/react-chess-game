@@ -6,35 +6,34 @@ export default class Rook extends Piece {
     }
 
     isMovePossible(src, dest) {
-        const mod = src % 8;
-        const diff = 8 - mod;
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
 
-        return (Math.abs(src - dest) % 8 === 0 || (dest < src + diff && dest >= src - mod));
+        return (srcRank === destRank || srcFile === destFile);
     }
 
     getSrcToDestPath(src, dest) {
-        let path = [], pathStart, pathEnd, increment;
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
 
-        if (src > dest) {
-            pathStart = dest;
-            pathEnd = src;
+        let path = [];
+        let difference = 0;
+        let rankDirection = 0;
+        let fileDirection = 0;
+
+        if (srcRank === destRank) {
+            difference = Math.abs(destFile - srcFile);
+            fileDirection = (destFile - srcFile)/Math.abs(destFile - srcFile);
         } else {
-            pathStart = src;
-            pathEnd = dest;
+            difference = Math.abs(destRank - srcRank);
+            rankDirection = (destRank - srcRank)/Math.abs(destRank - srcRank);
         }
 
-        if (Math.abs(src - dest) % 8 === 0) {
-            increment = 8;
-            pathStart += 8;
-        } else {
-            increment = 1;
-            pathStart += 1;
-        }
-
-        for (let i = pathStart; i < pathEnd; i += increment) {
-            path.push(i);
+        for(let i = 1; i < difference; i++){
+            path.push({ rank: srcRank + i * rankDirection, file: srcFile + i * fileDirection });
         }
 
         return path;
     }
+
 }

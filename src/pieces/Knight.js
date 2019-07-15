@@ -6,14 +6,10 @@ export default class Knight extends Piece {
     }
 
     isMovePossible(src, dest) {
-        return (src - 17 === dest ||
-        src - 15 === dest ||
-        src - 10 === dest ||
-        src - 6 === dest ||
-        src + 17 === dest ||
-        src + 15 === dest ||
-        src + 10 === dest ||
-        src + 6 === dest);
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
+
+        return (Math.abs(destRank - srcRank) === 2 && Math.abs(destFile - srcFile) === 1) || (Math.abs(destRank - srcRank) === 1 && Math.abs(destFile - srcFile) === 2)
     }
 
     getSrcToDestPath() {

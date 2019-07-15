@@ -6,44 +6,42 @@ export default class Queen extends Piece {
     }
 
     isMovePossible(src, dest) {
-        let mod = src % 8;
-        let diff = 8 - mod;
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
 
-        return Math.abs(src - dest) % 9 === 0 ||
-            Math.abs(src - dest) % 8 === 0 ||
-            Math.abs(src - dest) % 7 === 0 ||
-            (dest < src + diff && dest >= src - mod);
+        return srcRank === destRank || 
+            srcFile === destFile || 
+            (Math.abs(destRank - srcRank) === Math.abs(destFile - srcFile));
+
+
     }
 
     getSrcToDestPath(src, dest) {
-        let path = [], pathStart, pathEnd, incrementBy;
+        const { srcRank, srcFile } = src;
+        const { destRank, destFile } = dest;
 
-        if (src > dest) {
-            pathStart = dest;
-            pathEnd = src;
+        let path = [];
+        let difference = 0;
+        let rankDirection = 0;
+        let fileDirection = 0;
+
+        if (srcRank === destRank) {
+            difference = Math.abs(destFile - srcFile);
+            fileDirection = (destFile - srcFile)/Math.abs(destFile - srcFile);
+        } else if (srcFile === destFile) {
+            difference = Math.abs(destRank - srcRank);
+            rankDirection = (destRank - srcRank)/Math.abs(destRank - srcRank);
         } else {
-            pathStart = src;
-            pathEnd = dest;
+            difference = Math.abs(destRank - srcRank);
+            rankDirection = (destRank - srcRank)/Math.abs(destRank - srcRank);
+            fileDirection = (destFile - srcFile)/Math.abs(destFile - srcFile);
         }
 
-        if (Math.abs(src - dest) % 9 === 0) {
-            incrementBy = 9;
-            pathStart += 9;
-        } else if (Math.abs(src - dest) % 8 === 0) {
-            incrementBy = 8;
-            pathStart += 8;
-        } else if (Math.abs(src - dest) % 7 === 0) {
-            incrementBy = 7;
-            pathStart += 7;
-        } else {
-            incrementBy = 1;
-            pathStart += 1;
-        }
-
-        for(let i = pathStart; i < pathEnd; i += incrementBy){
-            path.push(i);
+        for(let i = 1; i < difference; i++){
+            path.push({ rank: srcRank + i * rankDirection, file: srcFile + i * fileDirection });
         }
 
         return path;
     }
+
 }
