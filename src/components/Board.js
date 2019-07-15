@@ -3,14 +3,13 @@ import Square from './Square';
 
 const Board = (props) => {
 
-    function renderSquare(i, shade) {
+    function renderSquare(rank, file, shade) {
         const { squares, onClick } = props;
         return (
             <Square
-                piece={squares[i]}
-                style={squares[i] ? squares[i].style : null}
+                style={squares[rank][file] ? squares[rank][file].style : null}
                 shade={shade}
-                onClick={() => onClick(i)}
+                onClick={() => onClick(rank, file)}
             />
         )
     }
@@ -19,13 +18,13 @@ const Board = (props) => {
         return num % 2 === 0;
     }
 
-
+    // This board is only used for rendering, and has no impact on the game state
     const board = [];
     for(let i = 0; i < 8; i++) {
         const squareRows = [];
         for(let j = 0; j < 8; j++) {
             const squareShade = isEven(i + j) ? "light-square" : "dark-square";
-            squareRows.push(renderSquare((i * 8) + j, squareShade));
+            squareRows.push(renderSquare(i, j, squareShade));
         }
         board.push(<div className="board-row">{squareRows}</div>)
     }

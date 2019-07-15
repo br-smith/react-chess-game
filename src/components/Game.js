@@ -12,12 +12,13 @@ export default class Game extends Component {
         super();
 
         this.state = {
+            isInCheck: false,
             squares: initializeBoard(),
             whiteCapturedPieces: [],
             blackCapturedPieces: [],
             player: 1,
-            sourceSelection: -1,
             status: '',
+            source: undefined,
             turn: 'white',
         }
     }
@@ -25,67 +26,54 @@ export default class Game extends Component {
     isMoveLegal(srcToDestPath){
         let isLegal = true;
         for(let i = 0; i < srcToDestPath.length; i++){
-            if(this.state.squares[srcToDestPath[i]] !== null){
+            if(this.state.squares[srcToDestPath[i].rank][srcToDestPath[i].file]){
                 isLegal = false;
             }
         }
         return isLegal;
     }
 
-    handleClick(i) {
-        const { player, sourceSelection, turn } = this.state;
-        const squares = this.state.squares.slice();
+    handleClick(selectionRank, selectionFile) {
+        const { player, source, squares, turn } = this.state;
 
-        if (sourceSelection === -1) {
-            if (!squares[i] || squares[i].player !== player) {
-                this.setState({
-                    status: "Wrong selection. Choose player " + player + " pieces."
-                });
-            } else {
-                squares[i].style = { 
-                    ...squares[i].style, 
-                    backgroundColor: HIGHLIGHT_COLOR,
-                };
+        if (source) {
+            const { srcRank, srcFile } = source;
+            const dest = { destRank: selectionRank, destFile: selectionFile }
 
-                this.setState({
-                    status: "Choose destination for the selected piece",
-                    sourceSelection: i,
-                });
-            }
-        } else if (sourceSelection > -1) {
-            squares[sourceSelection].style = { 
-                ...squares[sourceSelection].style, 
+            squares[srcRank][srcFile].style = { 
+                ...squares[srcRank][srcFile].style, 
                 backgroundColor: null,
             };
 
-            if (squares[i] && squares[i].player === player) {
+            if (squares[selectionRank][selectionFile] && squares[selectionRank][selectionFile].player === player) {
                 this.setState({
                     status: "Wrong selection. Choose valid source and destination again.",
-                    sourceSelection: -1,
+                    source: undefined,
                 });
             } else {
                 const squares = this.state.squares.slice();
                 const whiteCapturedPieces = this.state.whiteCapturedPieces.slice();
                 const blackCapturedPieces = this.state.blackCapturedPieces.slice();
-                const isDestEnemyOccupied = squares[i] ? true : false; 
-                const isMovePossible = squares[sourceSelection].isMovePossible(sourceSelection, i, isDestEnemyOccupied);
-                const srcToDestPath = squares[sourceSelection].getSrcToDestPath(sourceSelection, i);
+                
+                const isDestEnemyOccupied = squares[selectionRank][selectionFile] ? true : false;
+                const isMovePossible = squares[srcRank][srcFile].isMovePossible(source, dest, isDestEnemyOccupied);
+                const srcToDestPath = squares[srcRank][srcFile].getSrcToDestPath(source, dest);
                 const isMoveLegal = this.isMoveLegal(srcToDestPath);
 
                 if (isMovePossible && isMoveLegal) {
-                    if (squares[i] !== null) {
-                        if (squares[i].player === 1){
-                            whiteCapturedPieces.push(squares[i]);
+                    if (isDestEnemyOccupied) {
+                        if (squares[selectionRank][selectionFile].player === 1){
+                            whiteCapturedPieces.push(squares[selectionRank][selectionFile]);
                         } else {
-                            blackCapturedPieces.push(squares[i]);
+                            blackCapturedPieces.push(squares[selectionRank][selectionFile]);
                         }
                     }
 
-                    squares[i] = squares[sourceSelection];
-                    squares[sourceSelection] = null;
+                    squares[selectionRank][selectionFile] = squares[srcRank][srcFile];
+                    squares[srcRank][srcFile] = 0;
 
                     this.setState({
-                        sourceSelection: -1,
+                        source: undefined,
                         squares,
                         whiteCapturedPieces,
                         blackCapturedPieces,
@@ -96,31 +84,48 @@ export default class Game extends Component {
                 } else {
                     this.setState({
                         status: "Wrong selection. Choose valid source and destination again.",
-                        sourceSelection: -1,
+                        source: undefined,
                     });
                 }
+            }
+        } else {
+            if (!squares[selectionRank][selectionFile] || squares[selectionRank][selectionFile].player !== player) {
+                this.setState({
+                    status: "Wrong selection. Choose player " + player + " pieces."
+                });
+            } else {
+                squares[selectionRank][selectionFile].style = { 
+                    ...squares[selectionRank][selectionFile].style, 
+                    backgroundColor: HIGHLIGHT_COLOR,
+                };
+
+                this.setState({
+                    status: "Choose destination for the selected piece",
+                    source: { srcRank: selectionRank, srcFile: selectionFile },
+                });
             }
         }
     }
 
     render() {
+        const { squares, status, turn, whiteCapturedPieces, blackCapturedPieces } = this.state
         return (
             <div className="game">
                 <div className="game-board">
                     <Board 
-                        squares = {this.state.squares}
-                        onClick = {(i) => this.handleClick(i)}
+                        squares = {squares}
+                        onClick = {(rank, file) => this.handleClick(rank, file)}
                     />
                 </div>
                 <div className="game-info">
                     <h3>Turn</h3>
-                    <div id="player-turn-box" style={{backgroundColor: this.state.turn}}>
+                    <div id="player-turn-box" style={{backgroundColor: turn}}>
                     </div>
-                    <div className="game-status">{this.state.status}</div>
+                    <div className="game-status">{status}</div>
                     <div className="captured-pieces-block">
                             <CapturedPieces
-                                whiteCapturedPieces = {this.state.whiteCapturedPieces}
-                                blackCapturedPieces = {this.state.blackCapturedPieces}
+                                whiteCapturedPieces = {whiteCapturedPieces}
+                                blackCapturedPieces = {blackCapturedPieces}
                             />
                     </div>
                 </div>
