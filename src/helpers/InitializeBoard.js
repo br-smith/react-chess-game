@@ -5,7 +5,7 @@ import Bishop from "../pieces/Bishop";
 import Queen from "../pieces/Queen";
 import King from "../pieces/King";
 
-export default function initializeBoard() {
+export function initializeBoard() {
     let squares = [
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -15,7 +15,9 @@ export default function initializeBoard() {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-    ]
+    ];
+    let whitePieces = [];
+    let blackPieces = [];
 
     for (let i = 0; i < 8; i++) {
         squares[1][i] = new Pawn(1);
@@ -43,5 +45,24 @@ export default function initializeBoard() {
     squares[0][4] = new King(1);
     squares[7][4] = new King(2);
 
-    return squares;
+    for (let i = 0; i < 8; i++) {
+        whitePieces.push({ piece: squares[0][i], square: { rank: 0, file: i } });
+        whitePieces.push({ piece: squares[1][i], square: { rank: 1, file: i } });
+
+        blackPieces.push({ piece: squares[6][i], square: { rank: 6, file: i } });
+        // blackPieces.push({ piece: squares[7][i], square: { rank: 7, file: i } });
+    }
+
+    return { squares, whitePieces, blackPieces };
 }
+
+export const threatenedSquares = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+]

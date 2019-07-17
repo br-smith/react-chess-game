@@ -66,4 +66,20 @@ export default class Pawn extends Piece {
         return [];
     }
 
+    getThreatenedSquares(src) {
+        const { rank, file } = src;
+
+        let threatened = [];
+
+        if (file - 1 >= 0) {
+            threatened.push({ rank: rank - 1, file: file - 1})
+        }
+
+        if (file + 1 <= 7) {
+            threatened.push({rank: rank - 1, file: file + 1})
+        }
+
+        return threatened;
+    }
+
 }
