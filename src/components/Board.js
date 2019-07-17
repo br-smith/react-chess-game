@@ -20,7 +20,7 @@ const Board = (props) => {
 
     // This board is only used for rendering, and has no impact on the game state
     const board = [];
-    for(let i = 0; i < 8; i++) {
+    for(let i = 7; i >= 0; i--) {
         const squareRows = [];
         for(let j = 0; j < 8; j++) {
             const squareShade = isEven(i + j) ? "light-square" : "dark-square";
